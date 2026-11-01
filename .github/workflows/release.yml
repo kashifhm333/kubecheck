@@ -1,0 +1,193 @@
+name: Release & PyPI Publish Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish_to_pypi:
+        description: 'Publish to PyPI'
+        required: true
+        type: boolean
+        default: true
+      create_github_release:
+        description: 'Create GitHub Release (requires tag)'
+        required: true
+        type: boolean
+        default: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  # -------------------------------------------------------------
+  # Job 1: Verification Test Gate
+  # -------------------------------------------------------------
+  quality-gate:
+    name: Release Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: true
+
+      - name: Run Go Unit and Parity Tests
+        run: |
+          go vet ./...
+          go test -v ./...
+          make smoke-test
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python Build Dependencies
+        run: pip install build twine ruamel.yaml jsonschema
+
+      - name: Check Python Version Alignment
+        shell: bash
+        run: |
+          INIT_VER=$(python -c "import kubecheck; print(kubecheck.__version__)")
+          TOML_VER=$(python -c "import re; print(re.search(r'version\s*=\s*\"([^\"]+)\"', open('pyproject.toml').read()).group(1))")
+          if [ "$INIT_VER" != "$TOML_VER" ]; then
+            echo "Version mismatch: $INIT_VER vs $TOML_VER"
+            exit 1
+          fi
+
+  # -------------------------------------------------------------
+  # Job 2: Build Native Standalone Cross-Platform Binaries
+  # -------------------------------------------------------------
+  build-native-binaries:
+    name: Build Native Cross-Compiled Binaries
+    needs: [quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+
+      - name: Cross-Compile Standalone Binaries and Archives
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ -z "$VERSION" ] || [ "$VERSION" = "main" ]; then
+            VERSION=$(python3 -c "import kubecheck; print(kubecheck.__version__)")
+          fi
+          make dist-checksums VERSION="$VERSION"
+
+      - name: Upload Binary Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-binary-archives
+          path: |
+            dist/archives/*
+            dist/checksums.txt
+          retention-days: 7
+
+  # -------------------------------------------------------------
+  # Job 3: Build Python Distribution (sdist & wheel)
+  # -------------------------------------------------------------
+  build-pypi-packages:
+    name: Build PyPI Distribution Archives
+    needs: [quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Build Tools
+        run: pip install --upgrade pip build twine
+
+      - name: Build Source Distribution and Wheel
+        run: python -m build
+
+      - name: Validate Package Metadata
+        run: python -m twine check --strict dist/*
+
+      - name: Upload PyPI Distribution Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pypi-distribution-archives
+          path: dist/*
+          retention-days: 7
+
+  # -------------------------------------------------------------
+  # Job 4: Publish to PyPI
+  # -------------------------------------------------------------
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [quality-gate, build-pypi-packages]
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_to_pypi == true)
+    steps:
+      - name: Download PyPI Distribution Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pypi-distribution-archives
+          path: dist/
+
+      - name: Publish Package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+          verbose: true
+
+  # -------------------------------------------------------------
+  # Job 5: Create GitHub Release (on Git Tag or manual release)
+  # -------------------------------------------------------------
+  github-release:
+    name: Create GitHub Release
+    needs: [quality-gate, build-native-binaries, build-pypi-packages]
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.create_github_release == true && startsWith(github.ref, 'refs/tags/v'))
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download Native Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: native-binary-archives
+          path: release-assets/
+
+      - name: Download PyPI Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pypi-distribution-archives
+          path: release-assets/
+
+      - name: Generate Release Notes & Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false

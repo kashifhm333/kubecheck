@@ -1,25 +1,25 @@
 {
   "document_id": "PERF-BENCH-SUMMARY-001",
-  "timestamp": "2026-10-31T17:32:25Z",
-  "single_manifest_latency_ms": 9.795,
-  "throughput_resources_per_sec": 14246.709644050805,
-  "stream_duration_ms": 70.191,
+  "timestamp": "2026-11-01T07:58:15Z",
+  "single_manifest_latency_ms": 14.095,
+  "throughput_resources_per_sec": 10698.594696792197,
+  "stream_duration_ms": 93.47,
   "total_stream_resources": 1000,
-  "peak_alloc_mb": 12.833259582519531,
+  "peak_alloc_mb": 12.333259582519531,
   "memory_growth_mb": 0,
   "gate_results": {
     "GATE-REL-REQ-011-LATENCY": {
       "requirement_id": "GATE-REL-REQ-011",
       "description": "Single manifest (\u003c 100 lines) wall-clock execution \u003c= 20 ms",
       "threshold": "Latency \u003c= 20.0 ms",
-      "actual": "Avg Latency = 9.79 ms",
+      "actual": "Avg Latency = 14.10 ms",
       "passed": true
     },
     "GATE-REL-REQ-011-THROUGHPUT": {
       "requirement_id": "GATE-REL-REQ-011",
       "description": "Multi-document stream throughput \u003e= 1,000 resources/second (SARCH-001 §11)",
       "threshold": "Throughput \u003e= 1,000 resources/sec",
-      "actual": "Throughput = 14246.7 resources/sec (duration: 70.2 ms)",
+      "actual": "Throughput = 10698.6 resources/sec (duration: 93.5 ms)",
       "passed": true
     },
     "GATE-REL-REQ-012-LEAK": {

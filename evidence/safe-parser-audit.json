@@ -1,12 +1,12 @@
 {
   "document_id": "SAFE-PARSER-AUDIT-001",
-  "timestamp": "2026-10-31T17:32:26Z",
+  "timestamp": "2026-11-01T07:58:16Z",
   "gate_results": {
     "GATE-REL-REQ-010-ALIAS": {
       "requirement_id": "GATE-REL-REQ-010",
       "description": "Billion-laughs alias bomb safely intercepted by resource governor without OOM or hang",
       "threshold": "Duration \u003c 2.0s, Governor rule KCHK-GOV-002 triggered",
-      "actual": "Duration = 13.50 ms, Rule triggered = true",
+      "actual": "Duration = 21.08 ms, Rule triggered = true",
       "passed": true
     },
     "GATE-REL-REQ-010-TAG": {

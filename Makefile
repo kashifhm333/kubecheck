@@ -104,4 +104,13 @@ parity-test: build
 test-benchmark: build
 	go test -v ./tests/benchmark/...
 
-.PHONY: test-benchmark
+.PHONY: test-benchmark pypi-build pypi-check pypi-clean
+
+pypi-clean:
+	rm -rf dist/ build/ *.egg-info
+
+pypi-build: pypi-clean
+	python3 -m build
+
+pypi-check: pypi-build
+	python3 -m twine check --strict dist/*
