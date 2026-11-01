@@ -4,34 +4,49 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kubecheck"
-version = "1.0.0"
-description = "Diagnostic static analysis engine for Kubernetes manifests"
+version = "0.1.0"
+description = "Offline-first CLI tool to diagnose Kubernetes YAML manifest problems locally."
 readme = "README.md"
-authors = [{ name = "KubeCheck Core Team", email = "maintainers@kubecheck.io" }]
+requires-python = ">=3.8"
 license = { text = "Apache-2.0" }
+authors = [
+    { name = "Kashif Hussain", email = "memonkashif0001@gmail.com" }
+]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: Apache Software License",
-    "Operating System :: POSIX :: Linux",
-    "Operating System :: MacOS",
-    "Operating System :: Microsoft :: Windows",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Quality Assurance",
 ]
-requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "ruamel.yaml>=0.18.0",
+    "jsonschema>=4.0.0"
+]
 
 [project.scripts]
-kubecheck = "kubecheck.cli:main"
-kubectl-check = "kubecheck.cli:kubectl_plugin_main"
+kubecheck = "kubecheck.cli:run"
+kubectl-kubecheck = "kubecheck.cli:run"
 
 [project.urls]
-Homepage = "https://github.com/kubecheck/kubecheck"
-Documentation = "https://github.com/kubecheck/kubecheck/docs"
-Changelog = "https://github.com/kubecheck/kubecheck/releases"
+Homepage = "https://github.com/kashifhm333/kubecheck"
+Repository = "https://github.com/kashifhm333/kubecheck"
+Issues = "https://github.com/kashifhm333/kubecheck/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kubecheck*"]
+
+[tool.setuptools.package-data]
+"kubecheck" = [
+    "knowledge/**/*",
+    "schemas/**/*"
+]

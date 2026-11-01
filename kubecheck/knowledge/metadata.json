@@ -1,0 +1,24 @@
+{
+  "bundle_id": "kubecheck-standard-2026.10.1",
+  "bundle_version": 20261001,
+  "format_version": "1.0.0",
+  "engine_compatibility": {
+    "min_version": "0.1.0",
+    "max_version": "1.99.99"
+  },
+  "kubernetes_versions": [
+    {"minor": "1.24", "patch_pin": "1.24.17", "schema_version": "1.0.0", "status": "deprecated"},
+    {"minor": "1.25", "patch_pin": "1.25.16", "schema_version": "1.0.0", "status": "deprecated"},
+    {"minor": "1.26", "patch_pin": "1.26.15", "schema_version": "1.0.0", "status": "deprecated"},
+    {"minor": "1.27", "patch_pin": "1.27.16", "schema_version": "1.0.0", "status": "supported"},
+    {"minor": "1.28", "patch_pin": "1.28.15", "schema_version": "1.0.0", "status": "supported"},
+    {"minor": "1.29", "patch_pin": "1.29.10", "schema_version": "1.0.0", "status": "supported"},
+    {"minor": "1.30", "patch_pin": "1.30.6", "schema_version": "1.0.0", "status": "supported"},
+    {"minor": "1.31", "patch_pin": "1.31.2", "schema_version": "1.0.0", "status": "supported"}
+  ],
+  "provenance": {
+    "source": "https://github.com/kubernetes/kubernetes",
+    "generation_date": "2026-10-31T00:00:00Z"
+  },
+  "licenses": ["Apache-2.0"]
+}

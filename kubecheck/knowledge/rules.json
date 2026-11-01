@@ -1,0 +1,173 @@
+[
+  {
+    "id": "WL-CONTAINER-001",
+    "title": "Container image unpinned or using latest tag",
+    "description": "Images should use an immutable digest or pinned semantic version tag rather than :latest or no tag.",
+    "category": "workload",
+    "severity": "warning",
+    "evidence_class": "probable",
+    "remediation": "Pin container image tags to a specific immutable semantic release or SHA-256 digest."
+  },
+  {
+    "id": "WL-RES-001",
+    "title": "Container missing resource requests or limits",
+    "description": "Resource limits and requests are required to enable predictable QoS and fair node sharing.",
+    "category": "workload",
+    "severity": "warning",
+    "evidence_class": "probable",
+    "remediation": "Define both resources.requests and resources.limits for cpu and memory in container spec."
+  },
+  {
+    "id": "WL-PROBE-001",
+    "title": "Container missing liveness or readiness probe",
+    "description": "Readiness probes prevent unhealthy pods from receiving traffic; liveness probes trigger restarts on deadlocks.",
+    "category": "workload",
+    "severity": "info",
+    "evidence_class": "probable",
+    "remediation": "Specify readinessProbe and livenessProbe for web/service-facing containers."
+  },
+  {
+    "id": "SEC-CTX-001",
+    "title": "Privileged container execution prohibited",
+    "description": "Privileged containers share root access with the host kernel and bypass container isolation.",
+    "category": "security",
+    "severity": "error",
+    "evidence_class": "deterministic",
+    "remediation": "Set securityContext.privileged: false on all containers."
+  },
+  {
+    "id": "SEC-CTX-002",
+    "title": "Privilege escalation allowed in container",
+    "description": "Allowing privilege escalation allows child processes to gain more privileges than their parent.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Set securityContext.allowPrivilegeEscalation: false."
+  },
+  {
+    "id": "NET-SVC-001",
+    "title": "Service missing pod selector",
+    "description": "Services without selectors do not route traffic to Pods unless custom Endpoints are manually configured.",
+    "category": "network",
+    "severity": "warning",
+    "evidence_class": "context-dependent",
+    "remediation": "Specify spec.selector matching the target deployment pod template labels."
+  },
+  {
+    "id": "SEC-CTX-003",
+    "title": "Dangerous Linux capability CAP_SYS_ADMIN added",
+    "description": "CAP_SYS_ADMIN grants near-root capabilities inside the container namespace.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Remove CAP_SYS_ADMIN from securityContext.capabilities.add."
+  },
+  {
+    "id": "SEC-CTX-004",
+    "title": "Capabilities drop absent or does not include ALL",
+    "description": "Least privilege mandates dropping all default Linux capabilities before adding specific required ones.",
+    "category": "security",
+    "severity": "info",
+    "evidence_class": "context-dependent",
+    "remediation": "Specify securityContext.capabilities.drop: ['ALL']."
+  },
+  {
+    "id": "SEC-CTX-005",
+    "title": "Host network namespace shared",
+    "description": "hostNetwork: true exposes host network interfaces and allows sniffing loopback traffic.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Remove hostNetwork: true or set it to false."
+  },
+  {
+    "id": "SEC-CTX-006",
+    "title": "Host PID namespace shared",
+    "description": "hostPID: true allows inspecting and signaling host processes outside the container.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Remove hostPID: true or set it to false."
+  },
+  {
+    "id": "SEC-CTX-007",
+    "title": "Host IPC namespace shared",
+    "description": "hostIPC: true allows accessing host shared memory mechanisms.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Remove hostIPC: true or set it to false."
+  },
+  {
+    "id": "SEC-CTX-011",
+    "title": "Host path volume mount security analysis",
+    "description": "hostPath volume mounts expose the underlying host filesystem directly to the container.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "context-dependent",
+    "remediation": "Replace hostPath volumes with persistent volume claims (PVC) or emptyDir."
+  },
+  {
+    "id": "SEC-CTX-014",
+    "title": "Root user execution or configuration conflict",
+    "description": "Containers should run as a non-root user to mitigate potential escape vulnerabilities.",
+    "category": "security",
+    "severity": "error",
+    "evidence_class": "deterministic",
+    "remediation": "Specify securityContext.runAsNonRoot: true and provide a non-zero runAsUser."
+  },
+  {
+    "id": "SEC-CTX-017",
+    "title": "Read-only root filesystem not enforced",
+    "description": "An immutable root filesystem prevents attackers from writing malicious binaries to disk.",
+    "category": "security",
+    "severity": "info",
+    "evidence_class": "context-dependent",
+    "remediation": "Set securityContext.readOnlyRootFilesystem: true and mount writable state to tmpfs."
+  },
+  {
+    "id": "SEC-CTX-018",
+    "title": "Seccomp confinement disabled (Unconfined)",
+    "description": "Disabling seccomp profile allows arbitrary syscall execution.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Set securityContext.seccompProfile.type: RuntimeDefault."
+  },
+  {
+    "id": "SEC-RBAC-004",
+    "title": "Wildcard permissions in RBAC role rules",
+    "description": "Wildcards ('*') in verbs or resources violate the principle of least privilege.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "deterministic",
+    "remediation": "Enumerate explicit verbs (get, list, watch) and resource names."
+  },
+  {
+    "id": "SEC-RBAC-012",
+    "title": "Dangerous ClusterRoleBinding targets",
+    "description": "Binding cluster-admin role to default service accounts or wide groups introduces privilege escalation.",
+    "category": "security",
+    "severity": "error",
+    "evidence_class": "deterministic",
+    "remediation": "Restrict cluster-admin bindings to dedicated administrative subjects."
+  },
+  {
+    "id": "SEC-SECRET-001",
+    "title": "Secret reference contains disallowed 'namespace' field",
+    "description": "Secret references in container volume mounts cannot cross namespace boundaries.",
+    "category": "security",
+    "severity": "error",
+    "evidence_class": "deterministic",
+    "remediation": "Remove namespace property from secret volume source specification."
+  },
+  {
+    "id": "SEC-SECRET-006",
+    "title": "Literal sensitive value in container environment variable",
+    "description": "Plaintext secret values or credentials stored in env.value are exposed in manifests.",
+    "category": "security",
+    "severity": "warning",
+    "evidence_class": "probable",
+    "remediation": "Reference credentials via secretKeyRef or configMapKeyRef."
+  }
+]

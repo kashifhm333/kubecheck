@@ -11,9 +11,21 @@ coverage/
 *.out
 *.test
 
+# Python packaging and environments
+dist/
+build/
+*.egg-info/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.pypirc
+
 # Editor and OS
 .DS_Store
 .idea/
 .vscode/
 *.swp
 *~
+pypi.txt

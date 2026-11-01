@@ -1,0 +1,17 @@
+[
+  {"group": "extensions", "version": "v1beta1", "kind": "Deployment", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "extensions", "version": "v1beta1", "kind": "DaemonSet", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "extensions", "version": "v1beta1", "kind": "ReplicaSet", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "extensions", "version": "v1beta1", "kind": "Ingress", "deprecated_in": "1.14", "removed_in": "1.22", "replacement_api": "networking.k8s.io/v1"},
+  {"group": "extensions", "version": "v1beta1", "kind": "NetworkPolicy", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "networking.k8s.io/v1"},
+  {"group": "apps", "version": "v1beta1", "kind": "Deployment", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "apps", "version": "v1beta1", "kind": "StatefulSet", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "apps", "version": "v1beta2", "kind": "Deployment", "deprecated_in": "1.9", "removed_in": "1.16", "replacement_api": "apps/v1"},
+  {"group": "networking.k8s.io", "version": "v1beta1", "kind": "Ingress", "deprecated_in": "1.19", "removed_in": "1.22", "replacement_api": "networking.k8s.io/v1"},
+  {"group": "batch", "version": "v1beta1", "kind": "CronJob", "deprecated_in": "1.21", "removed_in": "1.25", "replacement_api": "batch/v1"},
+  {"group": "policy", "version": "v1beta1", "kind": "PodDisruptionBudget", "deprecated_in": "1.21", "removed_in": "1.25", "replacement_api": "policy/v1"},
+  {"group": "autoscaling", "version": "v2beta1", "kind": "HorizontalPodAutoscaler", "deprecated_in": "1.22", "removed_in": "1.25", "replacement_api": "autoscaling/v2"},
+  {"group": "autoscaling", "version": "v2beta2", "kind": "HorizontalPodAutoscaler", "deprecated_in": "1.23", "removed_in": "1.26", "replacement_api": "autoscaling/v2"},
+  {"group": "flowcontrol.apiserver.k8s.io", "version": "v1beta2", "kind": "FlowSchema", "deprecated_in": "1.26", "removed_in": "1.29", "replacement_api": "flowcontrol.apiserver.k8s.io/v1"},
+  {"group": "flowcontrol.apiserver.k8s.io", "version": "v1beta2", "kind": "PriorityLevelConfiguration", "deprecated_in": "1.26", "removed_in": "1.29", "replacement_api": "flowcontrol.apiserver.k8s.io/v1"}
+]
