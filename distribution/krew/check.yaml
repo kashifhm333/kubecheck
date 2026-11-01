@@ -1,0 +1,51 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: check
+spec:
+  version: "v1.0.0"
+  homepage: "https://github.com/kubecheck/kubecheck"
+  shortDescription: "Static analysis and diagnostic engine for Kubernetes manifests"
+  description: |
+    KubeCheck is an offline diagnostic engine that validates Kubernetes manifests
+    for syntax errors, OpenAPI schema violations, semantic misalignments,
+    security misconfigurations, and version deprecations with high precision.
+  caveats: |
+    KubeCheck runs completely offline by default. To update schema bundles,
+    use 'kubectl check bundle update' or import offline bundles manually.
+  platforms:
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      uri: "https://github.com/kubecheck/kubecheck/releases/download/v1.0.0/kubecheck-v1.0.0-krew-linux-amd64.tar.gz"
+      sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      bin: "kubectl-check"
+    - selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+      uri: "https://github.com/kubecheck/kubecheck/releases/download/v1.0.0/kubecheck-v1.0.0-krew-linux-arm64.tar.gz"
+      sha256: "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+      bin: "kubectl-check"
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+      uri: "https://github.com/kubecheck/kubecheck/releases/download/v1.0.0/kubecheck-v1.0.0-krew-darwin-arm64.tar.gz"
+      sha256: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      bin: "kubectl-check"
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      uri: "https://github.com/kubecheck/kubecheck/releases/download/v1.0.0/kubecheck-v1.0.0-krew-darwin-amd64.tar.gz"
+      sha256: "88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589"
+      bin: "kubectl-check"
+    - selector:
+        matchLabels:
+          os: windows
+          arch: amd64
+      uri: "https://github.com/kubecheck/kubecheck/releases/download/v1.0.0/kubecheck-v1.0.0-krew-windows-amd64.zip"
+      sha256: "36a92cc94a9e0faadd89061386b41453716bf942e5047ecd03f46f69f53d4235"
+      bin: "kubectl-check.exe"

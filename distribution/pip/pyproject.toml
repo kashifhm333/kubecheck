@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel>=0.40.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kubecheck"
+version = "1.0.0"
+description = "Diagnostic static analysis engine for Kubernetes manifests"
+readme = "README.md"
+authors = [{ name = "KubeCheck Core Team", email = "maintainers@kubecheck.io" }]
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+kubecheck = "kubecheck.cli:main"
+kubectl-check = "kubecheck.cli:kubectl_plugin_main"
+
+[project.urls]
+Homepage = "https://github.com/kubecheck/kubecheck"
+Documentation = "https://github.com/kubecheck/kubecheck/docs"
+Changelog = "https://github.com/kubecheck/kubecheck/releases"

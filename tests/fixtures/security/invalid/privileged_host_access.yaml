@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dangerous-host-pod
+  namespace: default
+spec:
+  hostNetwork: true
+  hostPID: true
+  hostIPC: true
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+  containers:
+  - name: exploit-container
+    image: alpine:3.19
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+        - SYS_ADMIN

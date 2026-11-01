@@ -1,0 +1,19 @@
+# Binaries and build outputs
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+coverage/
+*.out
+*.test
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

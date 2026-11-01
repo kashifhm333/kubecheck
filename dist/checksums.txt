@@ -1,0 +1,10 @@
+33bb0ca78d729ff15f2a30a923ae1b8c8433ddb8fe768607b812ff69ebd9729d  kubecheck-v1.0.0-dev-darwin-amd64.tar.gz
+ab82fbf77d241ca61b9268e10aeb3f3ccdbf7f9c9ad1f1359f689c1c5472bd42  kubecheck-v1.0.0-dev-darwin-arm64.tar.gz
+95e89c37096652073ac1f8b49eeb86d9bebf04e33dd034e03d5db38938a98e27  kubecheck-v1.0.0-dev-krew-darwin-amd64.tar.gz
+1a88f44a3f635bec7def5baa93e1379001d4830a7c9a1dbcfcac97c89166521e  kubecheck-v1.0.0-dev-krew-darwin-arm64.tar.gz
+cf39a6eda59962b16d1e9866ef434f428300cde01f9f311875d64162eddacadb  kubecheck-v1.0.0-dev-krew-linux-amd64.tar.gz
+1c4e14feb47c4d859c4e0c59839fdd09ad2eabaa111aeaea6ab4f377622b085f  kubecheck-v1.0.0-dev-krew-linux-arm64.tar.gz
+70435270d02d899378c51e63b1023d3c24adcab854ecf65ce1ef9d63f20a631e  kubecheck-v1.0.0-dev-krew-windows-amd64.tar.gz
+ff071def34f92339add680d13b6abb96ae9e08e4aeb18670ac3a6e7a56210279  kubecheck-v1.0.0-dev-linux-amd64.tar.gz
+e16cba95fefb07c79dae985805dcdb07bd14e3e675538e8ea724ae4047a3f940  kubecheck-v1.0.0-dev-linux-arm64.tar.gz
+27a521ca81f89d1a3c1c684c914b242399b2f8947d6c202d3eafa5dd272f0ddc  kubecheck-v1.0.0-dev-windows-amd64.tar.gz

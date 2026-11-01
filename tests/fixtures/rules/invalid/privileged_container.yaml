@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dangerous-priv-pod
+  namespace: default
+spec:
+  containers:
+  - name: root-agent
+    image: alpine:3.19
+    securityContext:
+      privileged: true # SEC-CTX-001 error
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi

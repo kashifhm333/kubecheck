@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-a
+  namespace: default
+  ownerReferences:
+  - apiVersion: v1
+    kind: ConfigMap
+    name: cm-b
+    uid: uid-b
+data:
+  key: value-a
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-b
+  namespace: default
+  ownerReferences:
+  - apiVersion: v1
+    kind: ConfigMap
+    name: cm-a
+    uid: uid-a
+data:
+  key: value-b

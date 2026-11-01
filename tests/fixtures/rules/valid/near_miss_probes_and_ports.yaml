@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: near-miss-app
+  namespace: prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: near-miss-app
+  template:
+    metadata:
+      labels:
+        app: near-miss-app
+    spec:
+      containers:
+      - name: worker
+        image: registry.example.com/worker:v2.1.0
+        ports:
+        - name: metrics
+          containerPort: 9090
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "cat /tmp/healthy"
+          initialDelaySeconds: 15
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL

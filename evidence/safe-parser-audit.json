@@ -1,0 +1,21 @@
+{
+  "document_id": "SAFE-PARSER-AUDIT-001",
+  "timestamp": "2026-10-31T17:32:26Z",
+  "gate_results": {
+    "GATE-REL-REQ-010-ALIAS": {
+      "requirement_id": "GATE-REL-REQ-010",
+      "description": "Billion-laughs alias bomb safely intercepted by resource governor without OOM or hang",
+      "threshold": "Duration \u003c 2.0s, Governor rule KCHK-GOV-002 triggered",
+      "actual": "Duration = 13.50 ms, Rule triggered = true",
+      "passed": true
+    },
+    "GATE-REL-REQ-010-TAG": {
+      "requirement_id": "GATE-REL-REQ-010",
+      "description": "Untrusted language constructor tags rejected or rendered inert with rule KCHK-SEC-001",
+      "threshold": "Rule KCHK-SEC-001 triggered",
+      "actual": "Rule triggered = true",
+      "passed": true
+    }
+  },
+  "passed": true
+}
