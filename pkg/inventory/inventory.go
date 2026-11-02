@@ -270,6 +270,14 @@ func extractFromNode(doc *nir.Document, root *nir.Node, inv *Inventory) []Findin
 
 	// K8S-GVK-007 / 008: metadata
 	metaNode := root.Get("metadata")
+	var name string
+	var namespace string
+	isClusterScoped := ClusterScopedKinds[kind]
+	if !isClusterScoped {
+		namespace = "default"
+	}
+	var labels, annotations map[string]string
+
 	if metaNode == nil {
 		findings = append(findings, Finding{
 			RuleID:        RuleMissingMetadata,
@@ -278,9 +286,14 @@ func extractFromNode(doc *nir.Document, root *nir.Node, inv *Inventory) []Findin
 			Location:      root.Location,
 			EvidenceClass: "deterministic",
 		})
-		return findings
-	}
-	if metaNode.Kind != nir.KindMapping {
+		findings = append(findings, Finding{
+			RuleID:        RuleMissingName,
+			Severity:      "error",
+			Message:       fmt.Sprintf("Resource %s is missing required \"metadata.name\"", kind),
+			Location:      root.Location,
+			EvidenceClass: "deterministic",
+		})
+	} else if metaNode.Kind != nir.KindMapping {
 		findings = append(findings, Finding{
 			RuleID:        RuleMetadataNotMapping,
 			Severity:      "error",
@@ -288,13 +301,6 @@ func extractFromNode(doc *nir.Document, root *nir.Node, inv *Inventory) []Findin
 			Location:      metaNode.Location,
 			EvidenceClass: "deterministic",
 		})
-		return findings
-	}
-
-	// K8S-GVK-010: metadata.name
-	nameNode := metaNode.Get("name")
-	var name string
-	if nameNode == nil || nameNode.Value == "" {
 		findings = append(findings, Finding{
 			RuleID:        RuleMissingName,
 			Severity:      "error",
@@ -303,22 +309,30 @@ func extractFromNode(doc *nir.Document, root *nir.Node, inv *Inventory) []Findin
 			EvidenceClass: "deterministic",
 		})
 	} else {
-		name = nameNode.Value
-	}
+		// K8S-GVK-010: metadata.name
+		nameNode := metaNode.Get("name")
+		if nameNode == nil || nameNode.Value == "" {
+			findings = append(findings, Finding{
+				RuleID:        RuleMissingName,
+				Severity:      "error",
+				Message:       fmt.Sprintf("Resource %s is missing required \"metadata.name\"", kind),
+				Location:      metaNode.Location,
+				EvidenceClass: "deterministic",
+			})
+		} else {
+			name = nameNode.Value
+		}
 
-	// Namespace
-	isClusterScoped := ClusterScopedKinds[kind]
-	var namespace string
-	nsNode := metaNode.Get("namespace")
-	if nsNode != nil && nsNode.Value != "" {
-		namespace = nsNode.Value
-	} else if !isClusterScoped {
-		namespace = "default"
-	}
+		// Namespace
+		nsNode := metaNode.Get("namespace")
+		if nsNode != nil && nsNode.Value != "" {
+			namespace = nsNode.Value
+		}
 
-	// Labels & Annotations
-	labels := extractStringMap(metaNode.Get("labels"))
-	annotations := extractStringMap(metaNode.Get("annotations"))
+		// Labels & Annotations
+		labels = extractStringMap(metaNode.Get("labels"))
+		annotations = extractStringMap(metaNode.Get("annotations"))
+	}
 
 	resID := ResourceID{
 		Group:     group,

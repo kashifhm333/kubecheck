@@ -202,7 +202,41 @@ def python_analyze(paths: list[str], target_version: str = "1.31", recursive: bo
 
     lifecycle = load_knowledge_file("lifecycle.json") or []
     rules = load_knowledge_file("rules.json") or []
-    rule_map = {r["id"]: r for r in rules}
+    core_rules = {
+        "K8S-GVK-007": {
+            "evidence_class": "deterministic",
+            "remediation": 'Define a "metadata" section containing at least a name.',
+        },
+        "K8S-GVK-008": {
+            "evidence_class": "deterministic",
+            "remediation": 'Ensure "metadata" is formatted as a key-value mapping.',
+        },
+        "K8S-GVK-010": {
+            "evidence_class": "deterministic",
+            "remediation": 'Define metadata.name identifying the Kubernetes resource.',
+        },
+        "K8S-SCHEMA-001": {
+            "evidence_class": "deterministic",
+            "remediation": "Remove or correct unknown fields that do not conform to the Kubernetes API schema.",
+        },
+        "K8S-SCHEMA-003": {
+            "evidence_class": "deterministic",
+            "remediation": "Supply all required fields specified by the resource schema.",
+        },
+        "KCHK-SYN-001": {
+            "evidence_class": "deterministic",
+            "remediation": "Remove duplicate keys in YAML mappings.",
+        },
+        "KCHK-SYN-002": {
+            "evidence_class": "deterministic",
+            "remediation": "Fix syntax error to ensure valid YAML structure.",
+        },
+        "KCHK-DEP-001": {
+            "evidence_class": "deterministic",
+            "remediation": "Upgrade apiVersion to current stable group/version.",
+        },
+    }
+    rule_map = {**core_rules, **{r["id"]: r for r in rules}}
 
     findings: list[dict[str, Any]] = []
     total_docs = 0
@@ -267,7 +301,78 @@ def python_analyze(paths: list[str], target_version: str = "1.31", recursive: bo
                             "message": f"{api_version} for {kind} is deprecated; replace with {entry.get('replacement_api')}",
                         })
 
-            # 2. Workload and Security Rule Evaluations
+            # 2. Schema and Object Root Checks (K8S-SCHEMA-001, K8S-GVK-007, K8S-GVK-008, K8S-GVK-010, K8S-SCHEMA-003)
+            standard_top_fields = {
+                "apiVersion", "kind", "metadata", "spec", "status", "data",
+                "binaryData", "stringData", "type", "subsets", "roleRef",
+                "subjects", "rules", "secrets", "imagePullSecrets",
+            }
+            lines = content.splitlines()
+            for k in doc.keys():
+                if k not in standard_top_fields:
+                    line_no = 1
+                    for idx, line in enumerate(lines):
+                        if line.strip().startswith(f"{k}:"):
+                            line_no = idx + 1
+                            break
+                    findings.append({
+                        "rule_id": "K8S-SCHEMA-001",
+                        "severity": "warning",
+                        "file": file_label,
+                        "line": line_no,
+                        "message": f'Unknown field "{k}" at {kind}.{k}',
+                    })
+
+            metadata = doc.get("metadata")
+            if metadata is None:
+                findings.append({
+                    "rule_id": "K8S-GVK-007",
+                    "severity": "warning",
+                    "file": file_label,
+                    "line": 1,
+                    "message": 'Missing "metadata" section in Kubernetes object',
+                })
+                findings.append({
+                    "rule_id": "K8S-SCHEMA-003",
+                    "severity": "error",
+                    "file": file_label,
+                    "line": 1,
+                    "message": f'Missing required field "metadata" at {kind}.metadata',
+                })
+                findings.append({
+                    "rule_id": "K8S-GVK-010",
+                    "severity": "error",
+                    "file": file_label,
+                    "line": 1,
+                    "message": f'Resource {kind} is missing required "metadata.name"',
+                })
+            elif not isinstance(metadata, dict):
+                findings.append({
+                    "rule_id": "K8S-GVK-008",
+                    "severity": "error",
+                    "file": file_label,
+                    "line": 1,
+                    "message": 'Field "metadata" must be a mapping',
+                })
+                findings.append({
+                    "rule_id": "K8S-GVK-010",
+                    "severity": "error",
+                    "file": file_label,
+                    "line": 1,
+                    "message": f'Resource {kind} is missing required "metadata.name"',
+                })
+            else:
+                name = metadata.get("name")
+                if not name:
+                    findings.append({
+                        "rule_id": "K8S-GVK-010",
+                        "severity": "error",
+                        "file": file_label,
+                        "line": 1,
+                        "message": f'Resource {kind} is missing required "metadata.name"',
+                    })
+
+            # 3. Workload and Security Rule Evaluations
             spec = doc.get("spec", {})
             template_spec = spec.get("template", {}).get("spec", {}) if isinstance(spec, dict) else {}
             pod_spec = template_spec if template_spec else (spec if kind == "Pod" and isinstance(spec, dict) else {})

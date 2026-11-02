@@ -21,6 +21,7 @@ all: lint test build
 build:
 	@mkdir -p $(BIN_DIR)
 	go build -ldflags "$(LDFLAGS)" -trimpath -o $(BINARY) ./cmd/kubecheck
+	@mkdir -p kubecheck/bin && cp $(BINARY) kubecheck/bin/kubecheck
 
 test:
 	go test -v ./...
