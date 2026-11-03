@@ -94,7 +94,7 @@ jobs:
         run: python -m build
 
       - name: Validate Package Metadata (Twine Check)
-        run: python -m twine check --strict dist/*
+        run: python -m twine check --strict dist/*.whl dist/*.tar.gz
 
       - name: Install Built Wheel into Clean Environment
         shell: bash

@@ -26,12 +26,40 @@ EXIT_PARTIAL_SCAN = 5
 EXIT_BUNDLE_ERROR = 6
 
 
+def is_native_binary(file_path: Path) -> bool:
+    """Checks if a file is a valid compiled native binary for the host OS."""
+    try:
+        with open(file_path, "rb") as f:
+            magic = f.read(4)
+    except Exception:
+        return False
+
+    system = platform.system().lower()
+    if system == "windows":
+        return magic.startswith(b"MZ")
+    elif system == "darwin":
+        return magic in (
+            b"\xfe\xed\xfa\xce",
+            b"\xfe\xed\xfa\xcf",
+            b"\xce\xfa\xed\xfe",
+            b"\xcf\xfa\xed\xfe",
+            b"\xca\xfe\xba\xbe",
+        )
+    elif system == "linux":
+        return magic.startswith(b"\x7fELF")
+    return False
+
+
 def find_binary(binary_name: str = "kubecheck") -> Path | None:
     """Locates the native KubeCheck engine binary using strict precedence."""
+    # 0. Recursion guard: never invoke native binary if already executing inside KubeCheck
+    if os.environ.get("_KUBECHECK_NATIVE_EXEC"):
+        return None
+
     # 1. Explicit override via environment variable
     if env_path := os.environ.get("KUBECHECK_BIN"):
         candidate = Path(env_path)
-        if candidate.is_file() and os.access(candidate, os.X_OK):
+        if candidate.is_file() and os.access(candidate, os.X_OK) and is_native_binary(candidate):
             return candidate
 
     package_dir = Path(__file__).resolve().parent
@@ -52,25 +80,57 @@ def find_binary(binary_name: str = "kubecheck") -> Path | None:
     ]
 
     for candidate in candidates:
-        if candidate.is_file() and os.access(candidate, os.X_OK):
+        if candidate.is_file() and os.access(candidate, os.X_OK) and is_native_binary(candidate):
             return candidate
 
     # 3. System PATH lookup (excluding Python wrappers/shebang scripts)
+    import sysconfig
+
+    scripts_dirs = {
+        Path(sysconfig.get_path("scripts")).resolve(),
+        (Path(sys.prefix) / "bin").resolve(),
+        (Path(sys.prefix) / "Scripts").resolve(),
+    }
+
+    current_script_paths = set()
+    if sys.argv and sys.argv[0]:
+        p0 = Path(sys.argv[0]).resolve()
+        current_script_paths.add(p0)
+        current_script_paths.add(p0.with_suffix(""))
+        if system == "windows":
+            current_script_paths.add(p0.with_suffix(".exe"))
+
     for path_dir in os.environ.get("PATH", "").split(os.pathsep):
         if not path_dir:
             continue
         candidate = Path(path_dir) / full_name
-        if candidate.is_file() and os.access(candidate, os.X_OK):
-            try:
-                if candidate.resolve() == Path(sys.argv[0]).resolve():
+        if not (candidate.is_file() and os.access(candidate, os.X_OK)):
+            continue
+
+        resolved = candidate.resolve()
+
+        # Exclude ourselves (current script/binary or same path with/without extension)
+        if resolved in current_script_paths or resolved.with_suffix("") in current_script_paths:
+            continue
+
+        # Exclude anything installed in Python's scripts/bin directories matching our CLI names
+        if resolved.parent in scripts_dirs and resolved.stem.lower() in ("kubecheck", "kubectl-kubecheck"):
+            continue
+
+        # Exclude script/shebang wrappers
+        try:
+            with open(candidate, "rb") as f:
+                magic = f.read(4)
+                if magic.startswith(b"#!"):
                     continue
-                with open(candidate, "rb") as f:
-                    magic = f.read(4)
-                    if magic.startswith(b"#!"):
-                        continue
-            except Exception:
-                pass
-            return candidate
+        except Exception:
+            pass
+
+        # Must be a valid native binary for current platform
+        if not is_native_binary(candidate):
+            continue
+
+        return candidate
 
     return None
 
@@ -535,7 +595,9 @@ def run(args: list[str] | None = None) -> int:
         native_bin = find_binary("kubecheck")
         if native_bin:
             try:
-                proc = subprocess.run([str(native_bin)] + args)
+                env = os.environ.copy()
+                env["_KUBECHECK_NATIVE_EXEC"] = "1"
+                proc = subprocess.run([str(native_bin)] + args, env=env)
                 return proc.returncode
             except KeyboardInterrupt:
                 return EXIT_PARTIAL_SCAN

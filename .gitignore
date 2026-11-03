@@ -1,5 +1,6 @@
 # Binaries and build outputs
 bin/
+kubecheck/bin/
 *.exe
 *.exe~
 *.dll

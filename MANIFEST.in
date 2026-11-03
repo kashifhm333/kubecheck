@@ -2,4 +2,3 @@ include README.md
 include LICENSE
 recursive-include kubecheck/knowledge *.json
 recursive-include kubecheck/schemas *.json
-recursive-include kubecheck/bin *

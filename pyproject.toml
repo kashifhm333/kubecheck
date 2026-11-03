@@ -61,6 +61,5 @@ include = ["kubecheck*"]
 [tool.setuptools.package-data]
 "kubecheck" = [
     "knowledge/**/*",
-    "schemas/**/*",
-    "bin/**/*"
+    "schemas/**/*"
 ]
